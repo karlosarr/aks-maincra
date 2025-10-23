@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: minecraft
-        image: CONTAINER_REGISTRY_NAME.azurecr.io/minecraft-server:latest
+        image: IMAGE_PLACEHOLDER
         ports:
         - protocol: UDP
           containerPort: 19132

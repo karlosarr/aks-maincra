@@ -1,0 +1,45 @@
+name: Build, Push, and Update Manifest
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}/minecraft-server:latest
+
+      - name: Update Kubernetes manifest
+        run: |
+          sed -i "s|^\(\s*image:\s*\).*$|\1ghcr.io/${{ github.repository }}/minecraft-server:latest|g" minecraft.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add minecraft.yaml
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update minecraft.yaml with new image tag [skip ci]"
+            git push
+          fi
