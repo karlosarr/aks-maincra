@@ -28,7 +28,7 @@ jobs:
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i "s|IMAGE_PLACEHOLDER|ghcr.io/${{ github.repository }}/minecraft-server:latest|g" minecraft.yaml
+          sed -i "s|CONTAINER_REGISTRY_NAME.azurecr.io/minecraft-server:latest|ghcr.io/${{ github.repository }}/minecraft-server:latest|g" minecraft.yaml
 
       - name: Commit and push changes
         run: |
